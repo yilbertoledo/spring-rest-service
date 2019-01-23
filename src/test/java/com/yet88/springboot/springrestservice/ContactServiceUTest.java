@@ -16,14 +16,14 @@ import com.yet88.springboot.springrestservice.dao.ContactRepository;
 import com.yet88.springboot.springrestservice.model.Contact;
 
 /**
- * Class to test methods in ContactRepository
+ * Class to make unit tests for methods in ContactRepository
  * 
  * @author yilbertoledo
  *
  */
 @RunWith(SpringRunner.class)
 @DataJpaTest
-public class SpringRestServiceApplicationTests
+public class ContactServiceUTest
 {
     @Autowired
     private TestEntityManager entityManager;
@@ -32,7 +32,7 @@ public class SpringRestServiceApplicationTests
     private ContactRepository contactRepository;
 
     @Test
-    public void whenFindByName_thenReturnEmployee()
+    public void findContactById()
     {
         // given
         Contact alex = new Contact("yet", "May", "89098");
@@ -42,13 +42,10 @@ public class SpringRestServiceApplicationTests
         // when
         Optional<Contact> found = contactRepository.findById(alex.getId());
         if (found.isPresent())
-        {
             // then
             assertThat(found.get().getFirstName()).isEqualTo(alex.getFirstName());
-        }
         else
-        {
             assertTrue(false);
-        }
+
     }
 }
