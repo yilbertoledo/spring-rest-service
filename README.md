@@ -10,4 +10,7 @@ keywords:
 	<li>Spring Boot</li>
 	<li>Maven</li>
 	<li>H2</li>
+	<li>Mockito</li>
+	<li>JSONAssert</li>
+	<li>Mock MVC framework</li>
 <ul>

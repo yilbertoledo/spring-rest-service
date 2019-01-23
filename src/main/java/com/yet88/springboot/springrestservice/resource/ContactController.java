@@ -22,7 +22,7 @@ import com.yet88.springboot.springrestservice.model.Contact;
 import com.yet88.springboot.springrestservice.model.ContactModificable;
 
 @RestController
-public class ContactResource
+public class ContactController
 {
 
     @Autowired

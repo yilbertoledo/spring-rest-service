@@ -19,6 +19,14 @@ public class Contact
     {
     }
 
+    public Contact(String firstName, String lastName, String phone)
+    {
+        super();
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phone = phone;
+    }
+
     public long getId()
     {
         return id;
