@@ -49,10 +49,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter
     {
         http.httpBasic()
         .and().authorizeRequests()
-            .antMatchers("/**").anonymous() //Accessible for any user with or without authentication
+            .antMatchers("/public/**").anonymous() //Accessible for any user with or without authentication
             .antMatchers("/api/**").authenticated() //Accessible for any authenticated user
-            .antMatchers("/contacts/**").hasRole("ADMIN") //Accessible for authenticated user with "ADMIN" role
-            .antMatchers("/contacts/**").hasRole("USER") //Accessible for authenticated user with "USER" role
+            .antMatchers("/contacts/**").hasAnyRole("USER", "ADMIN") //Accessible for authenticated users with "ADMIN" or  "USER" role
         .and().csrf().disable().headers().frameOptions().disable()
         .and().formLogin().successHandler(mySuccessHandler).failureHandler(myFailureHandler);
     }
