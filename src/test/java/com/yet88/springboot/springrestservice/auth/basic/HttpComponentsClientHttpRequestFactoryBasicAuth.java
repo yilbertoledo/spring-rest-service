@@ -1,4 +1,4 @@
-package com.yet88.springboot.springrestservice;
+package com.yet88.springboot.springrestservice.auth.basic;
 
 import java.net.URI;
 
@@ -15,7 +15,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 /**
  * Subclass of HttpComponentsClientHttpRequestFactory to override the
  * createHttpContext method for Automatic Management of the Authorization HTTP
- * Header
+ * Header for Basic Authentication
  * 
  * @author yilbertoledo
  *
@@ -38,11 +38,14 @@ public class HttpComponentsClientHttpRequestFactoryBasicAuth extends HttpCompone
 
     private HttpContext createHttpContext()
     {
+        // Create AuthCache instance
         AuthCache authCache = new BasicAuthCache();
-
+        // Generate BASIC scheme object, initialize it and add it to the local
+        // auth cache
         BasicScheme basicAuth = new BasicScheme();
         authCache.put(host, basicAuth);
 
+        // Add AuthCache to the execution context
         BasicHttpContext localcontext = new BasicHttpContext();
         localcontext.setAttribute(HttpClientContext.AUTH_CACHE, authCache);
         return localcontext;

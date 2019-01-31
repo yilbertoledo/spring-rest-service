@@ -1,22 +1,24 @@
 package com.yet88.springboot.springrestservice;
 
-import static org.junit.Assert.assertTrue;
-
-import org.aspectj.lang.annotation.Before;
 import org.json.JSONException;
+import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.skyscreamer.jsonassert.JSONAssert;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.support.BasicAuthenticationInterceptor;
-import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer.ConcurrencyControlConfigurer;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.RestTemplate;
 
 import com.yet88.springboot.springrestservice.model.Contact;
 
@@ -37,31 +39,66 @@ public class SpringRestServiceApplicationITests
     @LocalServerPort
     public int port;
 
+    @Value("${authentication.type}")
+    private String authType;
+
     /**
      * Template used as rest client
      */
-    TestRestTemplate restTemplate = new TestRestTemplate();
+    TestRestTemplate testRestTemplate = new TestRestTemplate();
+
+    @Autowired
+    RestTemplate restTemplate;
 
     HttpHeaders headers = new HttpHeaders();
 
     @Test
-    public void getContact() throws JSONException
+    public void getContact_BasicAuth() throws JSONException
     {
+        Assume.assumeFalse(digestAuthEnabled());
         // Configure support for basic authentication
-        restTemplate.getRestTemplate().getInterceptors().add(new BasicAuthenticationInterceptor("admin", "adminPass"));
+        testRestTemplate.getRestTemplate().getInterceptors()
+                .add(new BasicAuthenticationInterceptor(Constants.INMEMORY_ADMIN_NAME, Constants.INMEMORY_ADMIN_PASSWD));
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
-        ResponseEntity<String> response = restTemplate.exchange(createUrl("/contacts/1"), HttpMethod.GET, entity,
+        ResponseEntity<String> response = testRestTemplate.exchange(createUrl("/contacts/1"), HttpMethod.GET, entity,
                 String.class);
-
         String expected = "{id:1,firstName:Juan,lastName:Villegas, phone:'+34867897788'}";
         // Assert for
         JSONAssert.assertEquals(expected, response.getBody(), false);
     }
 
     @Test
-    public void postContact() throws Exception
+    public void postContact_BasicAuth() throws Exception
     {
-        restTemplate.getRestTemplate().getInterceptors().add(new BasicAuthenticationInterceptor("admin", "adminPass"));
+        Assume.assumeFalse(digestAuthEnabled());
+        testRestTemplate.getRestTemplate().getInterceptors()
+                .add(new BasicAuthenticationInterceptor(Constants.INMEMORY_ADMIN_NAME, Constants.INMEMORY_ADMIN_PASSWD));
+        // Default mock Contact
+        Contact contact = new Contact("Negro", "Primero", "+7890987654");
+        HttpEntity<Contact> entity = new HttpEntity<Contact>(contact, headers);
+        ResponseEntity<String> response = testRestTemplate.exchange(createUrl("/contacts"), HttpMethod.POST, entity,
+                String.class);
+        // Get location from response header
+        String location = response.getHeaders().get(HttpHeaders.LOCATION).get(0);
+        Assert.assertTrue(location.contains("/contacts/"));
+    }
+
+    @Test
+    public void getContact_DigestAuth() throws Exception
+    {
+        Assume.assumeTrue(digestAuthEnabled());
+        // Given
+        // When
+        ResponseEntity<String> response = restTemplate.exchange(createUrl("/contacts"), HttpMethod.GET, null,
+                String.class);
+        // Then
+        Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
+    }
+    
+    @Test
+    public void postContact_DigestAuth() throws Exception
+    {
+        Assume.assumeTrue(digestAuthEnabled());
         // Default mock Contact
         Contact contact = new Contact("Negro", "Primero", "+7890987654");
         HttpEntity<Contact> entity = new HttpEntity<Contact>(contact, headers);
@@ -69,9 +106,7 @@ public class SpringRestServiceApplicationITests
                 String.class);
         // Get location from response header
         String location = response.getHeaders().get(HttpHeaders.LOCATION).get(0);
-        if (location == null)
-            System.out.println("NUUUULLLLLL");
-        assertTrue(location.contains("/contacts/"));
+        Assert.assertTrue(location.contains("/contacts/"));
     }
 
     /**
@@ -83,5 +118,16 @@ public class SpringRestServiceApplicationITests
     private String createUrl(String uri)
     {
         return "http://localhost:" + port + uri;
+    }
+
+    private boolean digestAuthEnabled()
+    {
+        boolean useDigestAuth = false;
+        ResponseEntity<String> response = testRestTemplate.exchange(createUrl("/login"), HttpMethod.GET, null,
+                String.class);
+        if (response.getHeaders().containsKey(HttpHeaders.WWW_AUTHENTICATE)
+                && response.getHeaders().get(HttpHeaders.WWW_AUTHENTICATE).toString().contains("Digest realm="))
+            useDigestAuth = true;
+        return useDigestAuth;
     }
 }

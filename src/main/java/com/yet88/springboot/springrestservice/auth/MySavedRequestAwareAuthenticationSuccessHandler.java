@@ -1,4 +1,4 @@
-package com.yet88.springboot.springrestservice;
+package com.yet88.springboot.springrestservice.auth;
 
 import java.io.IOException;
 

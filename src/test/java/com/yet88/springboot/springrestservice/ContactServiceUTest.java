@@ -35,15 +35,15 @@ public class ContactServiceUTest
     public void findContactById()
     {
         // given
-        Contact alex = new Contact("yet", "May", "89098");
-        entityManager.persist(alex);
+        Contact contTest = new Contact("yet", "May", "89098");
+        entityManager.persist(contTest);
         entityManager.flush();
 
         // when
-        Optional<Contact> found = contactRepository.findById(alex.getId());
+        Optional<Contact> found = contactRepository.findById(contTest.getId());
         if (found.isPresent())
             // then
-            assertThat(found.get().getFirstName()).isEqualTo(alex.getFirstName());
+            assertThat(found.get().getFirstName()).isEqualTo(contTest.getFirstName());
         else
             assertTrue(false);
 

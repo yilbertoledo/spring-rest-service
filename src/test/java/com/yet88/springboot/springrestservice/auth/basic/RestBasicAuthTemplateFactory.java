@@ -1,12 +1,11 @@
-package com.yet88.springboot.springrestservice;
+package com.yet88.springboot.springrestservice.auth.basic;
 
 import org.apache.http.HttpHost;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -16,11 +15,9 @@ import org.springframework.web.client.RestTemplate;
  *
  */
 @Configuration
-public class RestTemplateFactory implements FactoryBean<RestTemplate>, InitializingBean
+@ConditionalOnProperty(value = "authentication.type", havingValue = "basic", matchIfMissing = true)
+public class RestBasicAuthTemplateFactory implements FactoryBean<RestTemplate>, InitializingBean
 {
-    /**
-     * Autowire the port into the variable so that we can use it create the url.
-     */
     @Value("${server.port}")
     public int port;
 
