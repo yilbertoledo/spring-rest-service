@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 /**
  * Class for setting up the RestTemplate with Basic Authentication
  * 
- * @author yilbertoledo
+ * @author yilber.toledo
  *
  */
 @Configuration

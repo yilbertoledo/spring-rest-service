@@ -1,4 +1,4 @@
-package com.yet88.springboot.springrestservice.auth;
+package com.yet88.springboot.springrestservice.security;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -15,6 +15,13 @@ import org.springframework.security.web.authentication.www.DigestAuthenticationE
 import org.springframework.security.web.authentication.www.DigestAuthenticationFilter;
 
 import com.yet88.springboot.springrestservice.Constants;
+
+/**
+ * Spring Security Class for Digest Authentication / Authorization
+ * 
+ * @author yilber.toledo
+ *
+ */
 
 @Configuration
 @ConditionalOnProperty(value = "authentication.type", havingValue = "digest", matchIfMissing = false)
@@ -50,8 +57,8 @@ public class SecurityConfigDigestAuth extends WebSecurityConfigurerAdapter
     {
         InMemoryUserDetailsManager inMemoryUserDetailsManager = new InMemoryUserDetailsManager();
         inMemoryUserDetailsManager.createUser(User.withUsername(Constants.INMEMORY_USER_NAME)
-                .password(customPasswordEncoder().encode(Constants.INMEMORY_USER_PASSWD))
-                .roles(Constants.INMEMORY_USER_ROLE).build());
+                .password(customPasswordEncoder().encode(Constants.INMEMORY_USER_PASSWD)).roles(Constants.USER_ROLE)
+                .build());
         return inMemoryUserDetailsManager;
 
     }
@@ -61,7 +68,7 @@ public class SecurityConfigDigestAuth extends WebSecurityConfigurerAdapter
     {
         DigestAuthenticationEntryPoint bauth = new DigestAuthenticationEntryPoint();
         bauth.setRealmName(Constants.DIGEST_REALM);
-        bauth.setKey("MySecureKey");
+        bauth.setKey(Constants.DIGEST_KEY);
         return bauth;
     }
 

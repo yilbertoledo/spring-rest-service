@@ -1,4 +1,4 @@
-package com.yet88.springboot.springrestservice.auth;
+package com.yet88.springboot.springrestservice.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -13,6 +13,11 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 
 import com.yet88.springboot.springrestservice.Constants;
 
+/**
+ * Spring Security Class for Basic Authentication / Authorization  
+ * @author yilber.toledo
+ *
+ */
 @Configuration
 @ConditionalOnProperty(value = "authentication.type", havingValue = "basic", matchIfMissing = true)
 public class SecurityConfigBasicAuth extends WebSecurityConfigurerAdapter
@@ -39,10 +44,10 @@ public class SecurityConfigBasicAuth extends WebSecurityConfigurerAdapter
         auth.inMemoryAuthentication()
                 // Basic user
                 .withUser(Constants.INMEMORY_ADMIN_NAME).password(encoder().encode(Constants.INMEMORY_ADMIN_PASSWD))
-                .roles(Constants.INMEMORY_ADMIN_ROLE)
+                .roles(Constants.ADMIN_ROLE)
                 // Admin user
                 .and().withUser(Constants.INMEMORY_USER_NAME).password(encoder().encode(Constants.INMEMORY_USER_PASSWD))
-                .roles(Constants.INMEMORY_USER_ROLE);
+                .roles(Constants.USER_ROLE);
     }
 
     // Authorization : Role -> Access
@@ -53,7 +58,7 @@ public class SecurityConfigBasicAuth extends WebSecurityConfigurerAdapter
                 // Accessible for any authenticated user
                 .antMatchers("/api/**").authenticated()
                 // Accessible for authenticated users with ADMIN/USER roles.
-                .antMatchers("/contacts/**").hasAnyRole(Constants.INMEMORY_USER_ROLE, Constants.INMEMORY_ADMIN_ROLE)
+                .antMatchers("/contacts/**").hasAnyRole(Constants.USER_ROLE, Constants.ADMIN_ROLE)
                 // disable CSFR
                 .and().csrf().disable().headers().frameOptions().disable()
                 // Enable default login form and set handlers

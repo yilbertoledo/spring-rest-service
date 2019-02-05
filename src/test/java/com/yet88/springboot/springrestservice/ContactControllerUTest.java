@@ -28,7 +28,7 @@ import com.yet88.springboot.springrestservice.resource.ContactController;
 /**
  * Class to Test REST Methods (endpoints) in ContactController
  * 
- * @author yilbertoledo
+ * @author yilber.toledo
  *
  */
 @RunWith(SpringRunner.class)

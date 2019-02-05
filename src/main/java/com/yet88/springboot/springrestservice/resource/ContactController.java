@@ -1,7 +1,6 @@
 package com.yet88.springboot.springrestservice.resource;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -22,34 +22,36 @@ import com.yet88.springboot.springrestservice.model.Contact;
 import com.yet88.springboot.springrestservice.model.ContactModificable;
 
 @RestController
+@RequestMapping("/contacts")
 public class ContactController
 {
 
     @Autowired
     private ContactRepository contactRepository;
 
-    @GetMapping("/contacts")
-    public List<Contact> getAllContacts()
+    @GetMapping("")
+    public ResponseEntity<Iterable<Contact>> getAllContacts()
     {
-        return contactRepository.findAll();
+        Iterable<Contact> contIterable = contactRepository.findAll();
+        return ResponseEntity.ok(contIterable);
     }
 
-    @GetMapping("/contacts/{id}")
-    public Contact getContacts(@PathVariable(name = "id") long id)
+    @GetMapping("/{id}")
+    public ResponseEntity<Contact> getContacts(@PathVariable(name = "id") long id)
     {
         Optional<Contact> contact = contactRepository.findById(id);
         if (!contact.isPresent())
             throw new ContactNotFoundException("id-" + id);
-        return contact.get();
+        return ResponseEntity.ok(contact.get());
     }
 
-    @DeleteMapping("/contacts/{id}")
+    @DeleteMapping("/{id}")
     public void deleteContact(@PathVariable(name = "id") long id)
     {
         contactRepository.deleteById(id);
     }
 
-    @PostMapping("/contacts")
+    @PostMapping("")
     public ResponseEntity<Object> createContact(@RequestBody Contact contact)
     {
         Contact savedContact = contactRepository.save(contact);
@@ -58,7 +60,7 @@ public class ContactController
         return ResponseEntity.created(location).build();
     }
 
-    @PutMapping("/contacts/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<Object> replaceContact(@RequestBody Contact contact, @PathVariable long id)
     {
         Optional<Contact> contactOptional = contactRepository.findById(id);
@@ -69,7 +71,7 @@ public class ContactController
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/contacts/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<Object> partialUpdateContact(@RequestBody ContactModificable partialUpdate,
             @PathVariable("id") String id)
     {

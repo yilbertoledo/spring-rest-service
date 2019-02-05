@@ -1,4 +1,4 @@
-package com.yet88.springboot.springrestservice.auth;
+package com.yet88.springboot.springrestservice.security;
 
 import java.io.IOException;
 
@@ -19,7 +19,7 @@ import org.springframework.util.StringUtils;
  * send a 200 (OK) status code instead of 301 (MOVED PERMANENTLY) in case of
  * successfully authentication avoiding redirection.
  * 
- * @author yilbertoledo
+ * @author yilber.toledo
  *
  */
 @Component

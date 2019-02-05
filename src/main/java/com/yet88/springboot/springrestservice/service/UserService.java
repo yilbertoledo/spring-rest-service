@@ -1,37 +1,19 @@
 package com.yet88.springboot.springrestservice.service;
 
-import java.util.Collections;
+import java.util.List;
 
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
+import com.yet88.springboot.springrestservice.dto.UserDto;
+import com.yet88.springboot.springrestservice.model.User;
 
-@Component
-public class UserService implements UserDetailsService
+public interface UserService
 {
-    
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-            return new User(username, "adminPass", Collections.singleton(new SimpleGrantedAuthority("ADMIN")));
-    }
-    
-    /*
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException
-    {
-        User user = userRepository.findByUsername(username);
-        if (user == null)
-        {
-            throw new UsernameNotFoundException("UserName " + username + " not found");
-        }
-        else
-        {
-            return user;
-        }
-    }
-    */
+    User save(UserDto user);
 
+    List<User> findAll();
+
+    void delete(long id);
+
+    User findOne(String username);
+
+    User findById(Long id);
 }

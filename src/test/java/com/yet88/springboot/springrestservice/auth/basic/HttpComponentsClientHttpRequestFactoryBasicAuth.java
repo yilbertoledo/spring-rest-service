@@ -17,7 +17,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
  * createHttpContext method for Automatic Management of the Authorization HTTP
  * Header for Basic Authentication
  * 
- * @author yilbertoledo
+ * @author yilber.toledo
  *
  */
 public class HttpComponentsClientHttpRequestFactoryBasicAuth extends HttpComponentsClientHttpRequestFactory

@@ -18,7 +18,7 @@ import com.yet88.springboot.springrestservice.model.Contact;
 /**
  * Class to make unit tests for methods in ContactRepository
  * 
- * @author yilbertoledo
+ * @author yilber.toledo
  *
  */
 @RunWith(SpringRunner.class)

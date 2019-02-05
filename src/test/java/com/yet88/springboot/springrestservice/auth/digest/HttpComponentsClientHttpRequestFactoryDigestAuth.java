@@ -18,7 +18,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
  * createHttpContext method for Automatic Management of the Authorization HTTP
  * Header for Digest Authentication
  * 
- * @author yilbertoledo
+ * @author yilber.toledo
  *
  */
 public class HttpComponentsClientHttpRequestFactoryDigestAuth extends HttpComponentsClientHttpRequestFactory

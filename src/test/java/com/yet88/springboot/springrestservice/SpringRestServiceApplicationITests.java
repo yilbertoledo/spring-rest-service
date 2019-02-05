@@ -1,5 +1,7 @@
 package com.yet88.springboot.springrestservice;
 
+import static org.hamcrest.CoreMatchers.is;
+
 import org.json.JSONException;
 import org.junit.Assert;
 import org.junit.Assume;
@@ -25,7 +27,7 @@ import com.yet88.springboot.springrestservice.model.Contact;
 /**
  * Class to make integration tests for whole app
  * 
- * @author yilbertoledo
+ * @author yilber.toledo
  *
  */
 @RunWith(SpringRunner.class)
@@ -55,10 +57,10 @@ public class SpringRestServiceApplicationITests
     @Test
     public void getContact_BasicAuth() throws JSONException
     {
-        Assume.assumeFalse(digestAuthEnabled());
+        Assume.assumeThat(getAuthType(), is(AuthType.BASIC));
         // Configure support for basic authentication
-        testRestTemplate.getRestTemplate().getInterceptors()
-                .add(new BasicAuthenticationInterceptor(Constants.INMEMORY_ADMIN_NAME, Constants.INMEMORY_ADMIN_PASSWD));
+        testRestTemplate.getRestTemplate().getInterceptors().add(
+                new BasicAuthenticationInterceptor(Constants.INMEMORY_ADMIN_NAME, Constants.INMEMORY_ADMIN_PASSWD));
         HttpEntity<String> entity = new HttpEntity<String>(null, headers);
         ResponseEntity<String> response = testRestTemplate.exchange(createUrl("/contacts/1"), HttpMethod.GET, entity,
                 String.class);
@@ -70,9 +72,9 @@ public class SpringRestServiceApplicationITests
     @Test
     public void postContact_BasicAuth() throws Exception
     {
-        Assume.assumeFalse(digestAuthEnabled());
-        testRestTemplate.getRestTemplate().getInterceptors()
-                .add(new BasicAuthenticationInterceptor(Constants.INMEMORY_ADMIN_NAME, Constants.INMEMORY_ADMIN_PASSWD));
+        Assume.assumeThat(getAuthType(), is(AuthType.BASIC));
+        testRestTemplate.getRestTemplate().getInterceptors().add(
+                new BasicAuthenticationInterceptor(Constants.INMEMORY_ADMIN_NAME, Constants.INMEMORY_ADMIN_PASSWD));
         // Default mock Contact
         Contact contact = new Contact("Negro", "Primero", "+7890987654");
         HttpEntity<Contact> entity = new HttpEntity<Contact>(contact, headers);
@@ -86,7 +88,7 @@ public class SpringRestServiceApplicationITests
     @Test
     public void getContact_DigestAuth() throws Exception
     {
-        Assume.assumeTrue(digestAuthEnabled());
+        Assume.assumeThat(getAuthType(), is(AuthType.DIGEST));
         // Given
         // When
         ResponseEntity<String> response = restTemplate.exchange(createUrl("/contacts"), HttpMethod.GET, null,
@@ -94,11 +96,11 @@ public class SpringRestServiceApplicationITests
         // Then
         Assert.assertEquals(response.getStatusCode(), HttpStatus.OK);
     }
-    
+
     @Test
     public void postContact_DigestAuth() throws Exception
     {
-        Assume.assumeTrue(digestAuthEnabled());
+        Assume.assumeThat(getAuthType(), is(AuthType.DIGEST));
         // Default mock Contact
         Contact contact = new Contact("Negro", "Primero", "+7890987654");
         HttpEntity<Contact> entity = new HttpEntity<Contact>(contact, headers);
@@ -120,14 +122,24 @@ public class SpringRestServiceApplicationITests
         return "http://localhost:" + port + uri;
     }
 
-    private boolean digestAuthEnabled()
+    private enum AuthType
     {
-        boolean useDigestAuth = false;
+        BASIC, DIGEST, JWT
+    }
+
+    private AuthType getAuthType()
+    {
+        AuthType authType = AuthType.BASIC;
+
         ResponseEntity<String> response = testRestTemplate.exchange(createUrl("/login"), HttpMethod.GET, null,
                 String.class);
-        if (response.getHeaders().containsKey(HttpHeaders.WWW_AUTHENTICATE)
-                && response.getHeaders().get(HttpHeaders.WWW_AUTHENTICATE).toString().contains("Digest realm="))
-            useDigestAuth = true;
-        return useDigestAuth;
+        if (response.getHeaders().containsKey(HttpHeaders.WWW_AUTHENTICATE))
+        {
+            if (response.getHeaders().get(HttpHeaders.WWW_AUTHENTICATE).toString().contains("Digest realm="))
+                authType = AuthType.DIGEST;
+            else if (response.getHeaders().get(HttpHeaders.WWW_AUTHENTICATE).toString().contains("Bearer "))
+                authType = AuthType.JWT;
+        }
+        return authType;
     }
 }
